@@ -34,6 +34,8 @@ opencv-python-headless==5.0.0.93  # optional image preprocessing (headless: no G
 pytesseract==0.3.13        # OCR client (needs the Tesseract binary at runtime)
 reportlab==5.0.1           # verification / comparison PDF reports
 python-multipart==0.0.32   # multipart/form-data uploads
+fast-diff-match-patch>=2.1.0  # fast diff engine for pdf-diff
+lxml>=5.0.0                # XML parser for poppler/pdf-diff
 
 # --- HTTP client (used by tests / external calls) ---------------------------
 httpx==0.28.1
