@@ -2,114 +2,200 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    margin: 0;
-    font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-txt font-sans antialiased;
+    font-size: 13px;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Flat, minimal typography — no serif display faces. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans font-semibold text-txt;
+    letter-spacing: -0.015em;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand/35 ring-offset-1 ring-offset-canvas;
+  }
+
+  ::selection {
+    @apply bg-brand/15;
+  }
+
+  /* Thin, unobtrusive scrollbars suited to a dense workspace. */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #DFE2E7;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C9CDD4;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
 }
 
-code {
-    font-family:
-        source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+@layer components {
+  /* ---- Surfaces -------------------------------------------------------- */
+  .dt-panel {
+    @apply rounded-panel border border-line bg-canvas;
+  }
+
+  .dt-card {
+    @apply rounded-card border border-line bg-canvas;
+  }
+
+  .dt-section {
+    @apply bg-canvas-section;
+  }
+
+  /* ---- Typography helpers --------------------------------------------- */
+  .dt-label {
+    @apply text-[11px] font-medium uppercase tracking-[0.09em] text-txt-faint;
+  }
+
+  .dt-meta {
+    @apply text-meta text-txt-faint;
+  }
+
+  .dt-mono {
+    @apply font-mono text-[12px] text-txt-muted;
+  }
+
+  /* ---- Buttons --------------------------------------------------------- */
+  .dt-btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-control border px-3 py-1.5
+           text-[13px] font-medium transition-colors duration-fast
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .dt-btn-primary {
+    @apply dt-btn border-brand bg-brand text-txt-inverse hover:bg-brand-hover active:bg-brand-active;
+  }
+
+  .dt-btn-secondary {
+    @apply dt-btn border-line bg-canvas text-txt hover:bg-canvas-hover;
+  }
+
+  .dt-btn-ghost {
+    @apply dt-btn border-transparent bg-transparent text-txt-muted hover:bg-canvas-hover hover:text-txt;
+  }
+
+  .dt-btn-sm {
+    @apply px-2.5 py-1 text-[12.5px];
+  }
+
+  .dt-icon-btn {
+    @apply inline-flex h-7 w-7 items-center justify-center rounded-md text-txt-faint
+           transition-colors duration-fast hover:bg-canvas-hover hover:text-txt;
+  }
+
+  /* ---- Inputs ---------------------------------------------------------- */
+  .dt-input {
+    @apply w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-[13px] text-txt
+           placeholder:text-txt-faint transition-colors duration-fast
+           focus:border-brand/60 focus:outline-none focus:ring-2 focus:ring-brand/15;
+  }
+
+  .dt-select {
+    @apply dt-input cursor-pointer appearance-none bg-no-repeat pr-8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 9px center;
+  }
+
+  /* ---- Status pills ---------------------------------------------------- */
+  .dt-pill {
+    @apply inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-[11.5px] font-medium
+           leading-[1.4] whitespace-nowrap;
+  }
+
+  /* ---- Tables ---------------------------------------------------------- */
+  .dt-table {
+    @apply w-full border-collapse text-[13px];
+  }
+
+  .dt-table thead th {
+    @apply bg-canvas-section border-b border-line px-4 py-2.5 text-left
+           text-th font-medium text-txt-muted;
+  }
+
+  .dt-table tbody td {
+    @apply border-b border-line-soft px-4 py-0 align-middle text-txt;
+    height: 44px;
+  }
+
+  .dt-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .dt-table tbody tr {
+    @apply transition-colors duration-fast hover:bg-canvas-soft;
+  }
+
+  /* ---- Dividers -------------------------------------------------------- */
+  .dt-divider {
+    @apply border-t border-line;
+  }
+
+  .dt-divider-dotted {
+    @apply border-t border-dashed border-line;
+  }
+
+  /* ---- Sidebar nav ----------------------------------------------------- */
+  .dt-nav-item {
+    @apply flex h-9 items-center gap-2.5 rounded-control px-2.5 text-[13px] font-medium
+           text-txt-muted transition-colors duration-fast;
+  }
+
+  .dt-nav-item:hover {
+    @apply bg-canvas-hover text-txt;
+  }
+
+  .dt-nav-item-active {
+    @apply bg-brand text-txt-inverse;
+  }
+
+  .dt-nav-item-active:hover {
+    @apply bg-brand text-txt-inverse;
+  }
 }
 
-@layer base {
-    :root {
-        --background: 0 0% 100%;
-        --foreground: 0 0% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 0 0% 3.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 0 0% 3.9%;
-        --primary: 0 0% 9%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 0 0% 96.1%;
-        --secondary-foreground: 0 0% 9%;
-        --muted: 0 0% 96.1%;
-        --muted-foreground: 0 0% 45.1%;
-        --accent: 0 0% 96.1%;
-        --accent-foreground: 0 0% 9%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 89.8%;
-        --input: 0 0% 89.8%;
-        --ring: 0 0% 3.9%;
-        --chart-1: 12 76% 61%;
-        --chart-2: 173 58% 39%;
-        --chart-3: 197 37% 24%;
-        --chart-4: 43 74% 66%;
-        --chart-5: 27 87% 67%;
-        --radius: 0.5rem;
-    }
-    .dark {
-        --background: 0 0% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 0 0% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 0 0% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        --secondary: 0 0% 14.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%;
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 14.9%;
-        --input: 0 0% 14.9%;
-        --ring: 0 0% 83.1%;
-        --chart-1: 220 70% 50%;
-        --chart-2: 160 60% 45%;
-        --chart-3: 30 80% 55%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
-    }
-}
+@layer utilities {
+  .dt-scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .dt-scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 
-@layer base {
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
-}
-
-@layer base {
-    [data-debug-wrapper="true"] {
-        display: contents !important;
-    }
-
-    [data-debug-wrapper="true"] > * {
-        margin-left: inherit;
-        margin-right: inherit;
-        margin-top: inherit;
-        margin-bottom: inherit;
-        padding-left: inherit;
-        padding-right: inherit;
-        padding-top: inherit;
-        padding-bottom: inherit;
-        column-gap: inherit;
-        row-gap: inherit;
-        gap: inherit;
-        border-left-width: inherit;
-        border-right-width: inherit;
-        border-top-width: inherit;
-        border-bottom-width: inherit;
-        border-left-style: inherit;
-        border-right-style: inherit;
-        border-top-style: inherit;
-        border-bottom-style: inherit;
-        border-left-color: inherit;
-        border-right-color: inherit;
-        border-top-color: inherit;
-        border-bottom-color: inherit;
-    }
+  /* Subtle border-only card used across dense lists. */
+  .dt-hairline-b {
+    @apply border-b border-line-soft;
+  }
 }

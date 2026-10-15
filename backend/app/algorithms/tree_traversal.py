@@ -283,9 +283,13 @@ def validate_structure(
             present.append(section)
         else:
             missing.append(section)
+            # ``detail`` carries the bare section name. Consumers render the
+            # wording themselves ("missing section (Header)"), so baking a
+            # sentence in here produced "missing section (Missing required
+            # section: Header)".
             issues.append({
                 "type": "missing_section",
-                "detail": f"Missing required section: {section}",
+                "detail": section,
             })
 
     # Ordering of the root's direct children vs the required top-level order.
@@ -307,8 +311,8 @@ def validate_structure(
         issues.append({
             "type": "order_violation",
             "detail": (
-                f"Root children order {actual_order} does not match required "
-                f"order {expected_order}."
+                f"expected {' > '.join(expected_order) or 'nothing'}, "
+                f"found {' > '.join(actual_order) or 'nothing'}"
             ),
         })
 
@@ -321,7 +325,7 @@ def validate_structure(
             extra_sections.append(node.name)
             issues.append({
                 "type": "unexpected_section",
-                "detail": f"Unexpected section: {node.name}",
+                "detail": node.name,
             })
         for child in node.children:
             stack.append(child)
