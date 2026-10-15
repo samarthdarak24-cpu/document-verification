@@ -151,6 +151,13 @@ export function useFieldDiff() {
   });
 }
 
+export function usePdfDiff() {
+  return useMutation({
+    mutationFn: (params: Parameters<typeof api.comparePdfDiff>[0]) =>
+      api.comparePdfDiff(params),
+  });
+}
+
 // ---- duplicates ---------------------------------------------------------- //
 export function useDuplicates(params: Parameters<typeof api.listDuplicates>[0] = {}) {
   return useQuery({

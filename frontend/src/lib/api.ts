@@ -10,16 +10,20 @@ import type {
   AlgorithmRunOut,
   AnalyticsOverview,
   BenchmarkRunResponse,
+  ChangeDetectResponse,
   CompareResult,
   DocumentDetailOut,
   DocumentOut,
   DocumentTextOut,
   DuplicateGroupOut,
   DuplicatesSummary,
+  ExtendedPdfDiffResult,
   HealthResponse,
+  PdfMetadataResponse,
   ReportOut,
   SettingItem,
   TemplateOut,
+  TextChangeResponse,
   UploadResponse,
   VerificationDetailOut,
   VerificationRunOut,
@@ -168,6 +172,93 @@ export const api = {
         target_document_id: targetDocumentId,
       }),
     }),
+
+  comparePdfDiff: (params: {
+    sourceDocumentId?: string;
+    targetDocumentId?: string;
+    originalFile?: File;
+    modifiedFile?: File;
+    renderImage?: boolean;
+  }) => {
+    if (params.originalFile && params.modifiedFile) {
+      const formData = new FormData();
+      formData.append("original_file", params.originalFile);
+      formData.append("modified_file", params.modifiedFile);
+      formData.append("render_image", String(params.renderImage ?? true));
+      return request<ExtendedPdfDiffResult>("/compare/pdf-diff", {
+        method: "POST",
+        body: formData,
+      });
+    } else if (params.sourceDocumentId && params.targetDocumentId) {
+      return request<ExtendedPdfDiffResult>("/compare/pdf-diff", {
+        method: "POST",
+        body: JSON.stringify({
+          source_document_id: params.sourceDocumentId,
+          target_document_id: params.targetDocumentId,
+          render_image: params.renderImage ?? true,
+        }),
+      });
+    }
+    throw new Error("Provide either original and modified files, or document IDs.");
+  },
+
+  pageRenderUrl: (docOrTempId: string, page: number, dpi: number = 150) =>
+    `/api/compare/page-render/${encodeURIComponent(docOrTempId)}/${page}?dpi=${dpi}`,
+
+  diffImageUrl: (comparisonId: string) =>
+    `/api/compare/diff-image/${comparisonId}`,
+
+  exportPdfDiffReport: async (payload: unknown) => {
+    const response = await fetch("/api/compare/pdf-diff/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error("Failed to generate PDF diff report");
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `docutrace-diff-report.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  },
+
+  // ---- change detection & layout metadata -------------------------------- //
+  // `POST /changes/detect` aligns the two documents with LCS and refines each
+  // changed region with edit distance; when both are PDFs it also compares the
+  // span-level typography (font / size / colour / position).
+  detectChanges: (
+    sourceDocumentId: string,
+    targetDocumentId: string,
+    compareMetadata = true
+  ) =>
+    request<ChangeDetectResponse>("/changes/detect", {
+      method: "POST",
+      body: JSON.stringify({
+        source_document_id: sourceDocumentId,
+        target_document_id: targetDocumentId,
+        compare_metadata: compareMetadata,
+      }),
+    }),
+
+  // Raw-text variant — no stored file required.
+  detectTextChanges: (originalText: string, modifiedText: string) =>
+    request<TextChangeResponse>("/changes/text", {
+      method: "POST",
+      body: JSON.stringify({
+        original_text: originalText,
+        modified_text: modifiedText,
+      }),
+    }),
+
+  // 400s for non-PDF documents (span metadata has no meaning for a DOCX/image).
+  getPdfMetadata: (id: string, includeSpans = false) =>
+    request<PdfMetadataResponse>(
+      `/documents/${id}/pdf-metadata${includeSpans ? "?include_spans=true" : ""}`
+    ),
 
   // ---- duplicates -------------------------------------------------------- //
   listDuplicates: async (params: { limit?: number; group_type?: string } = {}) =>
